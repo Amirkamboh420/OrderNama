@@ -1,0 +1,184 @@
+// OrderNama — Order Management SaaS for Instagram/WhatsApp sellers
+// Prisma schema (PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A seller / business that uses OrderNama
+model Seller {
+  id            String   @id @default(cuid())
+  businessName  String
+  ownerName     String
+  phone        String
+  whatsappNumber String?
+  email        String?
+  city         String?
+  plan         String   @default("Free") // Free | Pro | Business
+  currency     String   @default("PKR")
+  romanUrdu    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customers    Customer[]
+  orders       Order[]
+  inventory    InventoryItem[]
+  settings     Setting?
+  whatsappLogs WhatsAppLog[]
+  formViews    FormView[]
+  staff        Staff[]
+  tickets      SupportTicket[]
+}
+
+/// Staff/helper accounts with limited permissions
+model Staff {
+  id           String   @id @default(cuid())
+  sellerId     String
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String
+  role         String   @default("staff") // staff | manager
+  permissions  String   @default("orders,customers,inventory") // comma-separated
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sellerId])
+}
+
+/// Support tickets from sellers
+model SupportTicket {
+  id        String   @id @default(cuid())
+  sellerId  String
+  seller    Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  subject   String
+  message   String
+  status    String   @default("open") // open | in_progress | resolved | closed
+  priority  String   @default("normal") // low | normal | high | urgent
+  category  String   @default("general") // general | billing | technical | feature_request
+  responses String   @default("[]") // JSON array of {from, message, at}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  sellerId     String
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String
+  address      String?
+  city         String?
+  notes        String?
+  instagram    String?
+  tags         String   @default("")
+  birthday     String?
+  isRepeat     Boolean  @default(false)
+  totalOrders  Int      @default(0)
+  totalSpent   Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders       Order[]
+
+  @@index([sellerId])
+  @@index([phone])
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  sellerId       String
+  seller         Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  orderNumber    String
+  customerId     String
+  customer       Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  itemsJson      String   // JSON array of { name, sku, qty, price }
+  subtotal       Float
+  shipping       Float    @default(0)
+  discount       Float    @default(0)
+  total          Float
+  status         String   @default("Pending") // Pending | Confirmed | Shipped | Delivered | Cancelled
+  paymentStatus  String   @default("Unpaid")  // Paid | Unpaid | Partial
+  paymentMethod  String   @default("COD")     // COD | JazzCash | EasyPaisa | Bank | Other
+  courier        String?
+  trackingNumber String?
+  notes          String?
+  source         String   @default("Manual") // Manual | Form | DM
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  whatsappLogs   WhatsAppLog[]
+
+  @@index([sellerId])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InventoryItem {
+  id           String   @id @default(cuid())
+  sellerId     String
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  name         String
+  sku          String?
+  category     String?
+  stock        Int      @default(0)
+  lowStockAt   Int      @default(5)
+  price        Float    @default(0)
+  soldCount    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sellerId])
+}
+
+model WhatsAppLog {
+  id        String   @id @default(cuid())
+  sellerId  String
+  seller    Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  toPhone   String
+  message   String
+  status    String   @default("sent") // sent | delivered | failed
+  createdAt DateTime @default(now())
+
+  @@index([sellerId])
+  @@index([orderId])
+}
+
+/// Tracks views of the public order form (for analytics)
+model FormView {
+  id        String   @id @default(cuid())
+  sellerId  String
+  seller    Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  slug      String
+  source    String   @default("direct") // direct | instagram | whatsapp | other
+  createdAt DateTime @default(now())
+
+  @@index([sellerId])
+  @@index([createdAt])
+}
+
+model Setting {
+  id            String   @id @default(cuid())
+  sellerId      String   @unique
+  seller        Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  autoConfirm   Boolean  @default(true)
+  autoStatusUpdate Boolean @default(true)
+  lowStockAlert Boolean  @default(true)
+  orderFormSlug String?
+  brandColor    String   @default("#1E8C45")
+  monthlyGoal   Float    @default(100000)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
