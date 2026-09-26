@@ -41,7 +41,9 @@ type SettingsResponse = {
   };
   setting: {
     orderFormSlug: string | null;
+    brandColor?: string | null;
   } | null;
+  items?: InventoryItem[];
 };
 
 type InventoryItem = {
@@ -81,7 +83,7 @@ type CartLine = {
  *  PublicOrderForm
  * ======================================================================= */
 
-export function PublicOrderForm() {
+export function PublicOrderForm({ publicSlug }: { publicSlug?: string }) {
   const [settings, setSettings] = React.useState<SettingsResponse | null>(null);
   const [items, setItems] = React.useState<InventoryItem[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -98,15 +100,21 @@ export function PublicOrderForm() {
   const [submitting, setSubmitting] = React.useState(false);
   const [success, setSuccess] = React.useState<{ orderNumber: string; total: number } | null>(null);
   const [inventoryEmpty, setInventoryEmpty] = React.useState(false);
+  const [storeUnavailable, setStoreUnavailable] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [s, inv] = await Promise.all([
-          api<SettingsResponse>("/api/settings"),
-          api<InventoryResponse>("/api/inventory").catch(() => ({ items: [] })),
-        ]);
+        const [s, inv] = publicSlug
+          ? await (async () => {
+              const store = await api<SettingsResponse>(`/api/public/stores/${encodeURIComponent(publicSlug)}`);
+              return [store, { items: store.items || [] }] as const;
+            })()
+          : await Promise.all([
+              api<SettingsResponse>("/api/settings"),
+              api<InventoryResponse>("/api/inventory").catch(() => ({ items: [] })),
+            ]);
         if (cancelled) return;
         setSettings(s);
         setItems(inv.items || []);
@@ -115,6 +123,7 @@ export function PublicOrderForm() {
       } catch (e) {
         if (cancelled) return;
         setLoading(false);
+        if (publicSlug) setStoreUnavailable(true);
         toast.error("Data load nahi hua", {
           description: e instanceof Error ? e.message : "Unknown error",
         });
@@ -123,10 +132,10 @@ export function PublicOrderForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [publicSlug]);
 
   const businessName = settings?.seller.businessName || "OrderNama Store";
-  const slug = settings?.setting?.orderFormSlug || "demo";
+  const slug = publicSlug || settings?.setting?.orderFormSlug || "demo";
 
   // ---- Cart helpers ------------------------------------------------------
 
@@ -188,6 +197,7 @@ export function PublicOrderForm() {
           customerCity: city.trim(),
           customerAddress: address.trim(),
           items: selectedLines.map((l) => ({
+            productId: l.id,
             name: l.name,
             sku: l.sku || null,
             qty: l.qty,
@@ -230,6 +240,18 @@ export function PublicOrderForm() {
           <Skeleton className="h-48" />
           <Skeleton className="h-32" />
         </div>
+      </div>
+    );
+  }
+
+  if (storeUnavailable) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-50/30 px-4 py-12">
+        <Card className="w-full max-w-lg border-brand-200/60 p-8 text-center">
+          <Store className="mx-auto h-10 w-10 text-brand-600" />
+          <h1 className="mt-4 text-xl font-bold text-foreground">Store available nahi hai</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Yeh order form link invalid ho sakta hai ya store ne form band kar diya hai. Store se updated link lein.</p>
+        </Card>
       </div>
     );
   }

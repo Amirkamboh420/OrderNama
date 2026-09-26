@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useApp } from "@/lib/store";
 import {
   ArrowRight,
@@ -755,15 +756,29 @@ function Footer() {
 }
 
 function FooterCol({ title, links }: { title: string; links: string[] }) {
+  const destinations: Record<string, string> = {
+    Features: "/features",
+    Pricing: "/pricing",
+    Demo: "/demo",
+    "Order Form": "/order/gulbahar-boutique",
+    About: "/about",
+    Contact: "/contact",
+    Careers: "/careers",
+    Blog: "/blog",
+    "Terms of Service": "/terms",
+    "Privacy Policy": "/privacy",
+    "WhatsApp Compliance": "/whatsapp-compliance",
+    "Data Export": "/data-export",
+  };
   return (
     <div>
       <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">{title}</h4>
       <ul className="mt-3 space-y-2">
         {links.map((l) => (
           <li key={l}>
-            <a href="#" className="text-xs text-muted-foreground transition hover:text-brand-700">
+            <Link href={destinations[l] || "/contact"} className="text-xs text-muted-foreground transition hover:text-brand-700">
               {l}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

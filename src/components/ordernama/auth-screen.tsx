@@ -1,29 +1,31 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useApp } from "@/lib/store";
+import Link from "next/link";
 import { ArrowLeft, BarChart3, Eye, EyeOff, LockKeyhole, Mail, PackageCheck, ShieldCheck, Store, Zap } from "lucide-react";
 
 type AuthMode = "login" | "register";
 
 export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onModeChange: (mode: AuthMode) => void; onBack: () => void }) {
-  const { enterApp } = useApp();
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [submitMessage, setSubmitMessage] = useState("");
   const isLogin = mode === "login";
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    enterApp();
+    setSubmitMessage(isLogin
+      ? "Sign-in is not enabled in this demo yet. Your credentials were not submitted."
+      : "Account creation is not enabled in this demo yet. Your details were not submitted.");
   }
 
   return (
-    <main className="auth-page relative flex min-h-screen items-center justify-center overflow-hidden bg-brand-50/60 p-4 sm:p-8">
-      <button onClick={onBack} className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/90 px-4 py-2 text-sm font-medium text-brand-800 shadow-sm transition hover:bg-brand-50 sm:left-8 sm:top-8">
+    <main className="auth-page relative flex min-h-screen items-center justify-center overflow-hidden bg-[#062519] p-3 sm:p-6 lg:p-8">
+      <button onClick={onBack} className="absolute left-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur transition hover:bg-white/15 sm:left-8 sm:top-8">
         <ArrowLeft className="h-4 w-4" /> Back to home
       </button>
 
-      <section className="auth-card grid w-full max-w-6xl overflow-hidden rounded-[2rem] bg-white shadow-[0_30px_100px_-35px_rgba(13,82,44,0.32)] lg:min-h-[690px] lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="auth-card grid w-full max-w-7xl overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#082b1d] shadow-[0_30px_100px_-35px_rgba(0,0,0,0.7)] lg:min-h-[min(760px,calc(100vh-4rem))] lg:grid-cols-[0.95fr_1.05fr]">
         <aside className="auth-welcome relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex xl:p-16">
           <div className="absolute -left-24 -top-32 h-[34rem] w-[34rem] rounded-full border-[42px] border-white/10" />
           <div className="absolute -bottom-44 -left-48 h-[36rem] w-[36rem] rounded-full border-[54px] border-white/10" />
@@ -46,25 +48,25 @@ export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onM
           <div className="relative z-10 mt-10 text-xs text-white/55">Built for growing Pakistani sellers · © OrderNama</div>
         </aside>
 
-        <div className="relative flex items-center justify-center px-6 py-14 sm:px-12 lg:px-14 xl:px-20">
-          <div className="absolute right-6 top-6 rounded-full bg-brand-50 px-4 py-2 text-xs font-semibold text-brand-800 sm:right-8 sm:top-8">{isLogin ? "Sign in" : "Create account"}</div>
+        <div className="auth-form-panel relative flex items-center justify-center px-6 py-14 text-white sm:px-12 lg:px-14 xl:px-20">
+          <div className="absolute right-6 top-6 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-semibold text-white sm:right-8 sm:top-8">{isLogin ? "Sign in" : "Create account"}</div>
           <div className="w-full max-w-md">
-            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 ring-1 ring-brand-100"><LockKeyhole className="h-6 w-6" /></div>
-            <h2 className="text-center text-2xl font-bold tracking-tight text-foreground">{isLogin ? "Login to your account" : "Create your account"}</h2>
-            <p className="mt-2 text-center text-sm text-muted-foreground">{isLogin ? "Enter your credentials to continue" : "Start managing your orders with ease"}</p>
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-300/30"><LockKeyhole className="h-6 w-6" /></div>
+            <h2 className="text-center text-2xl font-bold tracking-tight text-white">{isLogin ? "Login to your account" : "Create your account"}</h2>
+            <p className="mt-2 text-center text-sm text-white/60">{isLogin ? "Enter your credentials to continue" : "Start managing your orders with ease"}</p>
 
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <form onSubmit={handleSubmit} onChange={() => setSubmitMessage("")} className="mt-8 space-y-5">
               {!isLogin && <label className="block text-sm font-semibold">Full name<input required autoComplete="name" placeholder="Your name" className="auth-input mt-2" /></label>}
               <label className="block text-sm font-semibold">Email address<div className="auth-field mt-2"><Mail className="h-4 w-4 text-muted-foreground" /><input required type="email" autoComplete="email" placeholder="Enter your email address" /></div></label>
               <label className="block text-sm font-semibold">Password<div className="auth-field mt-2"><LockKeyhole className="h-4 w-4 text-muted-foreground" /><input required type={showPassword ? "text" : "password"} autoComplete={isLogin ? "current-password" : "new-password"} minLength={8} placeholder="Enter your password" /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-muted-foreground hover:text-brand-700">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></label>
-              {isLogin ? <div className="flex items-center justify-between text-xs"><label className="flex cursor-pointer items-center gap-2 text-muted-foreground"><input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="h-4 w-4 accent-brand-700" />Remember me</label><button type="button" className="font-medium text-brand-700 hover:underline">Forgot password?</button></div> : <p className="text-xs leading-5 text-muted-foreground">By creating an account, you agree to our <a href="#terms" className="font-medium text-brand-700 hover:underline">Terms</a> and <a href="#privacy" className="font-medium text-brand-700 hover:underline">Privacy Policy</a>.</p>}
+              {isLogin ? <div className="flex items-center justify-between text-xs"><label className="flex cursor-pointer items-center gap-2 text-white/65"><input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="h-4 w-4 accent-brand-500" />Remember me</label><a href="mailto:support@ordernama.com?subject=Password%20reset%20request" className="font-medium text-brand-300 hover:underline">Forgot password?</a></div> : <p className="text-xs leading-5 text-white/60">By creating an account, you agree to our <Link href="/terms" className="font-medium text-brand-300 hover:underline">Terms</Link> and <Link href="/privacy" className="font-medium text-brand-300 hover:underline">Privacy Policy</Link>.</p>}
               <button type="submit" className="w-full rounded-xl bg-brand-gradient px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-700/15 transition hover:brightness-105 active:scale-[0.99]">{isLogin ? "Continue" : "Create account"}</button>
+              {submitMessage && <p role="status" className="rounded-lg border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-center text-xs leading-5 text-amber-100">{submitMessage}</p>}
             </form>
 
-            <div className="my-6 flex items-center gap-3"><span className="h-px flex-1 bg-border" /><span className="text-xs text-muted-foreground">or</span><span className="h-px flex-1 bg-border" /></div>
-            <button type="button" className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-white px-5 py-3 text-sm font-medium text-foreground transition hover:bg-brand-50/60"><GoogleMark />Continue with Google</button>
-            <p className="mt-7 text-center text-sm text-muted-foreground">{isLogin ? "Don't have an account?" : "Already have an account?"}{" "}<button onClick={() => onModeChange(isLogin ? "register" : "login")} className="font-semibold text-brand-700 hover:underline">{isLogin ? "Sign up" : "Sign in"}</button></p>
-            <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted-foreground"><PackageCheck className="h-3.5 w-3.5 text-brand-600" />Need help? <a href="mailto:support@ordernama.com" className="font-medium text-brand-700 hover:underline">Contact support</a></p>
+            <p className="mt-5 text-center text-xs text-white/45">Want to explore first? <Link href="/demo" className="font-medium text-brand-300 hover:underline">Open the demo</Link></p>
+            <p className="mt-7 text-center text-sm text-white/60">{isLogin ? "Don't have an account?" : "Already have an account?"}{" "}<button onClick={() => onModeChange(isLogin ? "register" : "login")} className="font-semibold text-brand-300 hover:underline">{isLogin ? "Sign up" : "Sign in"}</button></p>
+            <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-white/55"><PackageCheck className="h-3.5 w-3.5 text-brand-400" />Need help? <a href="mailto:support@ordernama.com" className="font-medium text-brand-300 hover:underline">Contact support</a></p>
           </div>
         </div>
       </section>
@@ -74,8 +76,4 @@ export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onM
 
 function Feature({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
   return <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20">{icon}</div><div><p className="text-sm font-semibold">{title}</p><p className="mt-0.5 text-xs text-white/65">{subtitle}</p></div></div>;
-}
-
-function GoogleMark() {
-  return <svg viewBox="0 0 48 48" aria-hidden="true" className="h-4 w-4"><path fill="#FFC107" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.9 6.1-15Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.8l-6.6-5.1c-1.8 1.2-4 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44Z"/><path fill="#4A90E2" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8l6.8-5.3Z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.9-5.9A19.6 19.6 0 0 0 24 4 20 20 0 0 0 5.8 15.1l6.8 5.3C14.2 15.6 18.7 12 24 12Z"/></svg>;
 }
