@@ -26,7 +26,7 @@ import {
 const ALL_NAV: { key: ViewKey; label: string; icon: React.ComponentType<{ className?: string }>; hint?: string; section: string }[] = [
   // Owner/Staff section
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, section: "manage" },
-  { key: "orders", label: "Orders", icon: ShoppingBag, hint: "Manage all orders", section: "manage" },
+  { key: "orders", label: "Orders", icon: ShoppingBag, section: "manage" },
   { key: "customers", label: "Customers", icon: Users, section: "manage" },
   { key: "inventory", label: "Inventory", icon: Package, section: "manage" },
   { key: "analytics", label: "Analytics", icon: BarChart3, section: "manage" },
@@ -87,18 +87,18 @@ export function AppSidebar() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 transform border-r border-slate-200 bg-white transition-transform duration-300 md:static md:w-[76px] md:translate-x-0 dark:border-slate-800 dark:bg-card",
+          "fixed inset-y-0 left-0 z-50 w-72 transform border-r border-slate-200 bg-white transition-[width,transform] duration-300 md:static md:w-[76px] md:translate-x-0 lg:w-64 dark:border-slate-800 dark:bg-card",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
           {/* Brand header */}
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 bg-white px-5 py-4 md:justify-center md:px-2">
-            <Link href="/" className="flex min-w-0 items-center gap-2.5 md:justify-center">
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 bg-white px-5 py-4 md:justify-center md:px-2 lg:justify-between lg:px-5">
+            <Link href="/" className="flex min-w-0 items-center gap-2.5 md:justify-center lg:justify-start">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-gradient shadow-sm shadow-brand-700/20">
                 <Store className="h-5 w-5 text-white" />
               </div>
-              <div className="leading-tight md:hidden">
+              <div className="leading-tight md:hidden lg:block">
                 <div className="text-base font-bold tracking-tight text-slate-900 dark:text-foreground">OrderNama</div>
                 <div className="text-[10px] uppercase tracking-[0.14em] text-slate-500 dark:text-muted-foreground">
                   {role === "admin" ? "Admin Panel" : role === "customer" ? "Customer" : "Gulbahar Boutique"}
@@ -116,7 +116,7 @@ export function AppSidebar() {
 
           {/* Quick action — only for owner/staff */}
           {role !== "admin" && role !== "customer" && (
-            <div className="px-4 py-4 md:px-3 md:py-3">
+            <div className="px-4 py-4 md:px-3 md:py-3 lg:px-4">
               <button
                 onClick={() => {
                   setView("orders");
@@ -124,16 +124,16 @@ export function AppSidebar() {
                 }}
                 title="New Order"
                 aria-label="New Order"
-                className="group flex w-full items-center gap-2 rounded-xl bg-brand-gradient px-3.5 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition hover:shadow-lg hover:shadow-brand-600/30 md:justify-center md:px-0 md:py-3"
+                className="group flex w-full items-center gap-2 rounded-xl bg-brand-gradient px-3.5 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition hover:shadow-lg hover:shadow-brand-600/30 md:justify-center md:px-0 md:py-3 lg:justify-start lg:px-3.5 lg:py-2.5"
               >
                 <Home className="h-4 w-4" />
-                <span className="md:hidden">New Order</span>
+                <span className="md:hidden lg:inline">New Order</span>
               </button>
             </div>
           )}
 
           {/* Role badge */}
-          <div className="px-4 pb-2 md:hidden">
+          <div className="px-4 pb-2 md:hidden lg:block">
             <div className="flex items-center gap-2 rounded-lg bg-brand-50/60 px-3 py-1.5 dark:bg-brand-900/20">
               <Shield className="h-3.5 w-3.5 text-brand-600" />
               <span className="text-xs font-medium text-brand-700 dark:text-brand-300">
@@ -143,10 +143,10 @@ export function AppSidebar() {
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4 scrollbar-brand md:px-2">
+          <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4 scrollbar-brand md:px-2 lg:px-3">
             {sections.map((section) => (
               <div key={section.name}>
-                <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:hidden">
+                <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:hidden lg:block">
                   {section.name}
                 </p>
                 {section.items.map((item) => {
@@ -162,17 +162,14 @@ export function AppSidebar() {
                         setSidebar(false);
                       }}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition md:justify-center md:px-0 md:py-3",
+                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition md:justify-center md:px-0 md:py-3 lg:justify-start lg:px-3 lg:py-2.5",
                         active
                           ? "bg-brand-50 text-brand-800 ring-1 ring-brand-200 dark:bg-brand-900/30 dark:text-brand-300 dark:ring-brand-800"
                           : "text-muted-foreground hover:bg-brand-50/60 hover:text-brand-800 dark:hover:bg-brand-900/20"
                       )}
                     >
                       <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-brand-700 dark:text-brand-400" : "text-muted-foreground/80")} />
-                      <span className="flex-1 text-left md:hidden">{item.label}</span>
-                      {item.hint && (
-                        <span className="hidden text-[10px] text-muted-foreground lg:block md:hidden">{item.hint}</span>
-                      )}
+                      <span className="hidden flex-1 text-left lg:block">{item.label}</span>
                     </button>
                   );
                 })}
@@ -182,13 +179,13 @@ export function AppSidebar() {
 
           {/* Bottom plan card — only for owner */}
           {role === "owner" && (
-            <div className="border-t border-brand-200/60 p-4 dark:border-brand-800/60 md:hidden">
+            <div className="hidden border-t border-brand-200/60 p-4 dark:border-brand-800/60 lg:block">
               <div className="rounded-xl bg-brand-gradient-soft p-3 ring-1 ring-brand-200/60 dark:ring-brand-800/40">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-brand-800 dark:text-brand-300">Pro Plan</span>
+                  <span className="text-xs font-semibold text-brand-800 dark:text-brand-300">Workspace plan</span>
                   <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white">Active</span>
                 </div>
-                <p className="mt-1 text-[11px] text-brand-700/80 dark:text-brand-400/80">Unlimited orders · WhatsApp automation</p>
+                <p className="mt-1 text-[11px] text-brand-700/80 dark:text-brand-400/80">Manage your plan and billing settings.</p>
                 <button
                   onClick={() => setView("pricing")}
                   className="mt-2 w-full rounded-lg border border-brand-300 bg-white/60 py-1.5 text-[11px] font-semibold text-brand-800 transition hover:bg-white dark:bg-transparent dark:text-brand-300"
@@ -197,17 +194,6 @@ export function AppSidebar() {
                 </button>
               </div>
             </div>
-          )}
-          {role === "owner" && (
-            <button
-              type="button"
-              onClick={() => setView("pricing")}
-              title="Plans & Billing"
-              aria-label="Plans & Billing"
-              className="mx-auto mb-3 hidden h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-brand-50 hover:text-brand-700 md:flex"
-            >
-              <CreditCard className="h-5 w-5" />
-            </button>
           )}
         </div>
       </aside>

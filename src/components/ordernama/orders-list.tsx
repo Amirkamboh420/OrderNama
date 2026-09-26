@@ -322,9 +322,9 @@ export function OrdersList() {
       )}
     >
       {/* Filter bar */}
-      <Card className="gap-0 p-4 shadow-none border-brand-100 bg-brand-50/30">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-1">
+      <Card className="gap-0 rounded-2xl border-brand-100 bg-white p-4 shadow-sm sm:p-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="min-w-0 space-y-1 lg:col-span-2">
             <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Status
             </label>
@@ -343,7 +343,7 @@ export function OrdersList() {
             </Select>
           </div>
 
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1 lg:col-span-2">
             <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Payment
             </label>
@@ -360,7 +360,7 @@ export function OrdersList() {
             </Select>
           </div>
 
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1 lg:col-span-2">
             <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Sort
             </label>
@@ -377,25 +377,25 @@ export function OrdersList() {
             </Select>
           </div>
 
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1 lg:col-span-6">
             <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Search
             </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <div className="relative min-w-[min(100%,16rem)] flex-1">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
                 <Input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Order # / name / phone"
-                  className="pl-8 bg-background"
+                  className="h-10 bg-background pl-8"
                 />
               </div>
               <Button
                 size="icon"
                 variant="outline"
                 onClick={fetchOrders}
-                className="shrink-0 border-brand-200 text-brand-700 hover:bg-brand-50"
+                className="h-10 w-10 shrink-0 border-brand-200 text-brand-700 hover:bg-brand-50"
                 aria-label="Refresh"
               >
                 <RefreshCw className={cn("size-4", loading && "animate-spin")} />
@@ -405,7 +405,7 @@ export function OrdersList() {
                 variant="outline"
                 onClick={handleAutoAdvance}
                 disabled={autoAdvanceBusy}
-                className="shrink-0 border-brand-300 text-brand-700 hover:bg-brand-50"
+                className="h-10 shrink-0 border-brand-300 text-brand-700 hover:bg-brand-50"
                 title="Auto-advance stale orders (Pending→Confirmed→Shipped→Delivered)"
               >
                 <Zap className={cn("size-4", autoAdvanceBusy && "animate-pulse")} />
@@ -415,7 +415,7 @@ export function OrdersList() {
                 size="icon"
                 variant="outline"
                 onClick={exportCsv}
-                className="shrink-0 border-brand-200 text-brand-700 hover:bg-brand-50"
+                className="hidden h-10 w-10 shrink-0 border-brand-200 text-brand-700 hover:bg-brand-50 sm:inline-flex"
                 aria-label="Export CSV"
                 title="Export CSV"
               >
@@ -424,7 +424,7 @@ export function OrdersList() {
               <Button
                 size="icon"
                 onClick={() => setCreateOpen(true)}
-                className="shrink-0 bg-brand-gradient text-white hover:opacity-90"
+                className="hidden h-10 w-10 shrink-0 bg-brand-gradient text-white hover:opacity-90 sm:inline-flex"
                 aria-label="New order"
               >
                 <Plus className="size-4" />
@@ -434,7 +434,7 @@ export function OrdersList() {
         </div>
 
         {/* Counts */}
-        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-muted-foreground">
           <span>
             {loading ? (
               <span className="inline-flex items-center gap-1">

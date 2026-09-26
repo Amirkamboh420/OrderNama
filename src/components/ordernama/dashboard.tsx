@@ -508,7 +508,7 @@ export function Dashboard() {
       {/* Recent Orders + side column */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Recent Orders */}
-        <Card className="rounded-2xl border-slate-200/80 bg-white shadow-sm transition hover:shadow-md dark:border-slate-800 lg:col-span-2">
+        <Card className="self-start rounded-2xl border-slate-200/80 bg-white shadow-sm transition hover:shadow-md dark:border-slate-800 lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-brand-600" />
@@ -537,7 +537,7 @@ export function Dashboard() {
                 ))}
               </div>
             ) : recentOrders.length === 0 ? (
-              <div className="grid place-items-center py-12 text-center">
+              <div className="grid place-items-center py-8 text-center">
                 <div className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
                   <ShoppingBag className="h-6 w-6" />
                 </div>

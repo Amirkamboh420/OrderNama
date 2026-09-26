@@ -3,9 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, ArrowRight, Menu, LogOut, LayoutDashboard } from "lucide-react";
+import { ShoppingBag, ArrowRight, ArrowUpRight, Menu, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useApp } from "@/lib/store";
+
+const HEADER_GROUPS = [
+  { label: "Company", links: [{ label: "About", href: "/about" }, { label: "Careers", href: "/careers" }] },
+  { label: "Resources", links: [{ label: "Blog", href: "/blog" }, { label: "Order Form", href: "order-form" }, { label: "Data Export", href: "/data-export" }] },
+  { label: "Legal", links: [{ label: "Terms of Service", href: "/terms" }, { label: "Privacy Policy", href: "/privacy" }, { label: "WhatsApp Compliance", href: "/whatsapp-compliance" }] },
+];
 
 export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; onRegister: () => void }) {
   const router = useRouter();
@@ -13,6 +20,7 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [orderFormSlug, setOrderFormSlug] = useState("gulbahar-boutique");
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -24,6 +32,12 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
             email: result.user.email || "",
             role: result.user.role || "owner",
           });
+          fetch("/api/settings")
+            .then((response) => response.ok ? response.json() : null)
+            .then((settings: { setting?: { orderFormSlug?: string | null } } | null) => {
+              if (settings?.setting?.orderFormSlug) setOrderFormSlug(settings.setting.orderFormSlug);
+            })
+            .catch(() => undefined);
         }
       })
       .catch(() => setUser(null))
@@ -61,11 +75,34 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
-          <Link href="/features" className="text-sm font-medium text-muted-foreground transition hover:text-brand-700">Features</Link>
-          <Link href="/pricing" className="text-sm font-medium text-muted-foreground transition hover:text-brand-700">Pricing</Link>
-          <Link href="/demo" className="text-sm font-medium text-muted-foreground transition hover:text-brand-700">Demo</Link>
-          <Link href="/contact" className="text-sm font-medium text-muted-foreground transition hover:text-brand-700">Contact</Link>
+        <nav className="hidden items-center gap-1 xl:flex" aria-label="Main navigation">
+          <Link href="/features" className="rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-brand-50 hover:text-brand-700">Features</Link>
+          <Link href="/pricing" className="rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-brand-50 hover:text-brand-700">Pricing</Link>
+          <Link href="/demo" className="rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-brand-50 hover:text-brand-700">Demo</Link>
+          <Link href="/contact" className="rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-brand-50 hover:text-brand-700">Contact</Link>
+          {HEADER_GROUPS.map((group) => (
+            <DropdownMenu key={group.label}>
+              <DropdownMenuTrigger asChild>
+                <button className="group inline-flex items-center gap-1.5 rounded-xl border border-transparent px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-brand-100 hover:bg-brand-50 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 data-[state=open]:border-brand-200 data-[state=open]:bg-brand-50 data-[state=open]:text-brand-700">
+                  {group.label}<ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" sideOffset={10} className="min-w-60 rounded-2xl border-brand-100 bg-white/95 p-2 shadow-xl shadow-brand-950/10 ring-1 ring-brand-900/5 backdrop-blur-xl">
+                <div className="mb-1 border-b border-brand-100 px-3 pb-2.5 pt-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-brand-700">{group.label}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Explore OrderNama</p>
+                </div>
+                {group.links.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild>
+                    <Link className="min-h-10 cursor-pointer rounded-xl px-3 py-2 font-medium text-foreground transition-colors focus:bg-brand-50 focus:text-brand-800" href={item.href === "order-form" ? `/order/${orderFormSlug}` : item.href}>
+                      <span className="mr-2 flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50 text-brand-700"><ArrowUpRight className="h-4 w-4" /></span>
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -94,7 +131,7 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="xl:hidden"
             onClick={() => setMenuOpen((open) => !open)}
             aria-label="Open menu"
             aria-expanded={menuOpen}
@@ -104,10 +141,24 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
         </div>
       </div>
       {menuOpen && (
-        <nav className="grid gap-1 border-t border-brand-100 bg-white px-6 py-3 md:hidden" aria-label="Main navigation">
-          {[["Features", "/features"], ["Pricing", "/pricing"], ["Demo", "/demo"], ["Contact", "/contact"]].map(([label, href]) => (
-            <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-brand-50 hover:text-brand-700">{label}</Link>
-          ))}
+        <nav className="grid gap-4 border-t border-brand-100 bg-white px-6 py-4 xl:hidden" aria-label="Main navigation">
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-4">
+            {[["Features", "/features"], ["Pricing", "/pricing"], ["Demo", "/demo"], ["Contact", "/contact"]].map(([label, href]) => (
+              <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-800 hover:bg-brand-50">{label}</Link>
+            ))}
+          </div>
+          <div className="grid gap-4 border-t border-brand-100 pt-3 sm:grid-cols-3">
+            {HEADER_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{group.label}</p>
+                <div className="grid gap-0.5">
+                  {group.links.map((item) => (
+                    <Link key={item.label} href={item.href === "order-form" ? `/order/${orderFormSlug}` : item.href} onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-brand-50 hover:text-brand-700">{item.label}</Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </nav>
       )}
     </header>
