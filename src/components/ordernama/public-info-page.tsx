@@ -34,7 +34,7 @@ const pages = {
     intro: "OrderNama screens and APIs are designed to manage seller, customer, order, inventory, staff and support-ticket information.",
     sections: [
       ["Information in the demo", "The database schema includes business contact details, customer names and phone numbers, delivery addresses, order contents, staff records, support messages and form activity. Demo seed data is illustrative."],
-      ["Storage and controls", "The project uses a PostgreSQL database configured by the operator. This codebase does not currently show account-based access controls, customer self-service deletion, or a retention schedule, so avoid entering sensitive real customer data into an unconfigured deployment."],
+      ["Storage and controls", "The project uses a PostgreSQL database configured by the operator. Registered accounts use password hashes and signed, HTTP-only sessions to open their seller workspace. The public demo workspace is still available without signing in. This project does not currently include customer self-service deletion or a retention schedule."],
       ["Requests", "For privacy questions or a request to correct or remove information from a deployment, contact its operator at support@ordernama.com."],
     ],
   },
@@ -72,7 +72,10 @@ export function PublicInfoPage({ page }: { page: PublicInfoSlug }) {
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">{content.intro}</p>
         </header>
         <div className="space-y-7 p-7 sm:p-10">
-          {content.sections.map(([heading, text]) => <section key={heading}><h2 className="text-lg font-bold text-foreground">{heading}</h2><p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p></section>)}
+          {content.sections.map((section) => {
+            const [heading, text] = section;
+            return <section key={heading}><h2 className="text-lg font-bold text-foreground">{heading}</h2><p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p></section>;
+          })}
           <div className="flex flex-col gap-3 border-t border-brand-100 pt-6 sm:flex-row">
             <Link href="/features" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-3 text-sm font-semibold text-white hover:opacity-90">Explore features <ArrowRight className="h-4 w-4" /></Link>
             <a href="mailto:support@ordernama.com" className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 px-5 py-3 text-sm font-semibold text-brand-800 hover:bg-brand-50"><Mail className="h-4 w-4" /> Contact support</a>

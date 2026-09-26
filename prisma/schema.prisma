@@ -34,6 +34,22 @@ model Seller {
   formViews    FormView[]
   staff        Staff[]
   tickets      SupportTicket[]
+  accounts     UserAccount[]
+}
+
+/// Email/password accounts that own seller workspaces
+model UserAccount {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("owner")
+  sellerId     String
+  seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sellerId])
 }
 
 /// Staff/helper accounts with limited permissions

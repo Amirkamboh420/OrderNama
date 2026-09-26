@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
+import { getAuthSession } from "@/lib/auth";
 
 /**
- * Returns the active demo seller (the first seller created).
- * In a real multi-tenant app this would resolve from auth session.
+ * Demo visitors use the sample seller. Signed-in owners use their own seller workspace.
  */
 export async function getDemoSeller() {
   let seller = await db.seller.findFirst({ orderBy: { createdAt: "asc" } });
@@ -39,6 +39,11 @@ export async function getDemoSeller() {
 }
 
 export async function requireSeller() {
+  const session = await getAuthSession();
+  if (session) {
+    const seller = await db.seller.findUnique({ where: { id: session.sellerId } });
+    if (seller) return seller;
+  }
   const seller = await getDemoSeller();
   if (!seller) throw new Error("No seller found. Please seed the database.");
   return seller;

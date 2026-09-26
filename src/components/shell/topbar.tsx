@@ -39,6 +39,31 @@ export function AppTopbar() {
   const [now, setNow] = useState<string>("");
   const [romanUrdu, setRomanUrdu] = useState(true);
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [accountName, setAccountName] = useState("");
+
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((response) => response.json())
+      .then((result: { authenticated?: boolean; user?: { name?: string } | null }) => {
+        setAuthenticated(Boolean(result.authenticated));
+        setAccountName(result.user?.name || "");
+      })
+      .catch(() => setAuthenticated(false));
+  }, []);
+
+  async function signOut() {
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok) throw new Error("Sign out nahi ho saka.");
+      setAuthenticated(false);
+      setAccountName("");
+      exitApp();
+      toast.success("Aap sign out ho gaye.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Sign out nahi ho saka.");
+    }
+  }
   const meta = TITLES[view] ?? TITLES.dashboard;
 
   useEffect(() => {
@@ -191,10 +216,10 @@ export function AppTopbar() {
               aria-label="Account menu"
             >
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/30 text-[11px] font-bold ring-2 ring-white/40">
-                {role === "admin" ? "AD" : role === "customer" ? "GU" : "HP"}
+                {accountName ? accountName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() : role === "admin" ? "AD" : role === "customer" ? "GU" : "HP"}
               </div>
               <span className="hidden text-xs font-semibold sm:inline">
-                {role === "admin" ? "Admin" : role === "customer" ? "Customer" : "Hira P."}
+                {accountName || (role === "admin" ? "Admin" : role === "customer" ? "Customer" : "Hira P.")}
               </span>
               <ChevronDown className="hidden h-3 w-3 sm:inline" />
             </button>
@@ -202,6 +227,12 @@ export function AppTopbar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="text-xs text-muted-foreground">Switch Role</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {authenticated && (
+              <DropdownMenuItem onClick={signOut} className="cursor-pointer text-rose-600 focus:text-rose-700">
+                <Sun className="h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onClick={() => { setRole("owner"); toast.success("Switched to Owner role"); }}
               className="cursor-pointer"
