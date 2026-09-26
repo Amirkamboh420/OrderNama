@@ -219,7 +219,8 @@ export function AppTopbar() {
                 {accountName ? accountName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() : role === "admin" ? "AD" : role === "customer" ? "GU" : "HP"}
               </div>
               <span className="hidden text-xs font-semibold sm:inline">
-                {accountName || (role === "admin" ? "Admin" : role === "customer" ? "Customer" : "Hira P.")}
+                <span className="block">{accountName || (role === "admin" ? "Admin" : role === "customer" ? "Customer" : "Hira P.")}</span>
+                <span className="block text-[9px] font-medium uppercase tracking-wider text-white/75">{role}</span>
               </span>
               <ChevronDown className="hidden h-3 w-3 sm:inline" />
             </button>
