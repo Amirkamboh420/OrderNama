@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-export type Role = "owner" | "staff" | "admin" | "customer";
+export type Role = "owner" | "staff" | "manager" | "admin" | "customer";
 
 export type ViewKey =
   | "landing"
@@ -70,7 +70,7 @@ export const useApp = create<AppState>((set) => ({
   setRole: (r) => set((s) => {
     // When switching to customer role, go to order-form view
     // When switching to admin, go to admin-dashboard
-    // When switching to owner/staff, go to dashboard
+    // Seller team roles open the workspace dashboard.
     const view: ViewKey = r === "customer" ? "order-form" : r === "admin" ? "admin-dashboard" : "dashboard";
     return { role: r, view };
   }),
@@ -101,6 +101,10 @@ export function canAccess(role: Role, view: ViewKey): boolean {
   if (role === "staff") {
     // Staff can see orders, customers, inventory, dashboard, notifications, support — but NOT pricing/billing/settings
     return ["dashboard", "orders", "customers", "inventory", "analytics", "notifications", "support"].includes(view);
+  }
+  if (role === "manager") {
+    // Managers can manage the seller workspace, except billing and platform admin.
+    return !["pricing", "admin-dashboard", "sellers", "order-form"].includes(view);
   }
   // Owner can see everything
   return true;

@@ -47,6 +47,7 @@ const ALL_NAV: { key: ViewKey; label: string; icon: React.ComponentType<{ classN
 const ROLE_LABELS: Record<Role, string> = {
   owner: "Owner",
   staff: "Staff",
+  manager: "Manager",
   admin: "Admin",
   customer: "Customer",
 };
@@ -67,7 +68,7 @@ export function AppSidebar() {
   } else {
     const manageItems = navItems.filter((i) => i.section === "manage");
     if (manageItems.length) sections.push({ name: "Manage", items: manageItems });
-    if (role === "owner") {
+    if (role === "owner" || role === "manager") {
       const ownerItems = navItems.filter((i) => i.section === "owner");
       if (ownerItems.length) sections.push({ name: "Account", items: ownerItems });
     }

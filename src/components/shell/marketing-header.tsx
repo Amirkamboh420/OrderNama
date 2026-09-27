@@ -55,7 +55,7 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
 
   function openDashboard() {
     const role = user?.role;
-    if (role && ["owner", "staff", "admin", "customer"].includes(role)) setRole(role as Role);
+    if (role && ["owner", "staff", "manager", "admin", "customer"].includes(role)) setRole(role as Role);
     enterApp();
     if (role === "admin") setView("admin-dashboard");
     else if (role === "customer") setView("order-form");

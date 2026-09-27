@@ -49,7 +49,7 @@ export function AppTopbar() {
       .then((result: { authenticated?: boolean; user?: { name?: string; role?: string } | null }) => {
         setAuthenticated(Boolean(result.authenticated));
         setAccountName(result.user?.name || "");
-        if (result.user?.role && ["owner", "staff", "admin", "customer"].includes(result.user.role)) {
+        if (result.user?.role && ["owner", "staff", "manager", "admin", "customer"].includes(result.user.role)) {
           setRole(result.user.role as Role);
         }
       })

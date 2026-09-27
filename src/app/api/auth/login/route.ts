@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
   }
 
   return attachSessionCookie(
-    NextResponse.json({ ok: true, user: { id: staff.id, name: staff.name, email: staff.email, role: "staff" } }),
-    { id: staff.id, sellerId: staff.sellerId, name: staff.name, email: staff.email!, role: staff.role === "manager" ? "staff" : staff.role },
+    NextResponse.json({ ok: true, user: { id: staff.id, name: staff.name, email: staff.email, role: staff.role } }),
+    { id: staff.id, sellerId: staff.sellerId, name: staff.name, email: staff.email!, role: staff.role },
     body.remember !== false,
   );
 }

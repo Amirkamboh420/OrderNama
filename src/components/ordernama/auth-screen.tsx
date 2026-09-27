@@ -33,8 +33,9 @@ export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onM
       });
       const result = await response.json() as { error?: string; user?: { role?: string } };
       if (!response.ok) throw new Error(result.error || "Request complete nahi ho saki.");
-      setRole(result.user?.role === "owner" ? "owner" : "staff");
+      const role = result.user?.role;
       enterApp();
+      setRole(role === "owner" || role === "manager" || role === "admin" || role === "customer" ? role : "staff");
       router.replace("/");
     } catch (error) {
       setSubmitError(true);
