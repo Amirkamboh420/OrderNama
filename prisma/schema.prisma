@@ -58,6 +58,8 @@ model Staff {
   sellerId     String
   seller       Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   name         String
+  email        String?
+  passwordHash String?
   phone        String
   role         String   @default("staff") // staff | manager
   permissions  String   @default("orders,customers,inventory") // comma-separated
@@ -65,6 +67,7 @@ model Staff {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  @@index([email])
   @@index([sellerId])
 }
 

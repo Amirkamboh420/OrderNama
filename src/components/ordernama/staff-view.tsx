@@ -57,6 +57,7 @@ import { cn } from "@/lib/utils";
 type StaffMember = {
   id: string;
   name: string;
+  email: string | null;
   phone: string;
   role: string; // "staff" | "manager"
   permissions: string; // comma-separated
@@ -156,6 +157,8 @@ function StaffFormDialog({
   onSaved: () => void;
 }) {
   const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [role, setRole] = React.useState("staff");
   const [perms, setPerms] = React.useState<string[]>(["orders", "customers"]);
@@ -166,11 +169,15 @@ function StaffFormDialog({
     if (!open) return;
     if (mode === "edit" && initial) {
       setName(initial.name);
+      setEmail(initial.email || "");
+      setPassword("");
       setPhone(initial.phone);
       setRole(initial.role || "staff");
       setPerms(permissionsList(initial.permissions));
     } else {
       setName("");
+      setEmail("");
+      setPassword("");
       setPhone("");
       setRole("staff");
       setPerms(["orders", "customers"]);
@@ -188,13 +195,19 @@ function StaffFormDialog({
       toast.error("Naam aur phone dono required hain");
       return;
     }
+    if (!email.trim() || (mode === "add" && password.length < 8)) {
+      toast.error(mode === "add" ? "Email aur kam az kam 8 character password required hain" : "Valid email required hai");
+      return;
+    }
     setBusy(true);
     try {
       const payload = {
         name: name.trim(),
+        email: email.trim().toLowerCase(),
         phone: phone.trim(),
         role,
         permissions: perms.join(","),
+        ...(password ? { password } : {}),
       };
       if (mode === "edit" && initial) {
         await api(`/api/staff/${initial.id}`, {
@@ -278,6 +291,16 @@ function StaffFormDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="s-email">Login email</Label>
+              <Input id="s-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@example.com" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="s-password">{mode === "add" ? "Login password" : "New password (optional)"}</Label>
+              <Input id="s-password" type="password" autoComplete={mode === "add" ? "new-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "add" ? "At least 8 characters" : "Leave blank to keep current"} minLength={mode === "add" ? 8 : undefined} />
             </div>
           </div>
           <div className="space-y-2">
@@ -575,7 +598,7 @@ export function StaffView() {
                           </Badge>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground">{m.phone}</div>
+                      <div className="text-xs text-muted-foreground">{m.phone}{m.email ? ` · ${m.email}` : " · No login email"}</div>
                       <div className="flex flex-wrap gap-1 pt-0.5">
                         {perms.length === 0 ? (
                           <span className="text-[11px] italic text-muted-foreground">

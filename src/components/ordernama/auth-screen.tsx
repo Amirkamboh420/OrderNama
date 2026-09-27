@@ -31,9 +31,9 @@ export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onM
         credentials: "same-origin",
         body: JSON.stringify({ name: form.get("name"), email: form.get("email"), password: form.get("password"), remember }),
       });
-      const result = await response.json() as { error?: string };
+      const result = await response.json() as { error?: string; user?: { role?: string } };
       if (!response.ok) throw new Error(result.error || "Request complete nahi ho saki.");
-      setRole("owner");
+      setRole(result.user?.role === "owner" ? "owner" : "staff");
       enterApp();
       router.replace("/");
     } catch (error) {
@@ -83,7 +83,7 @@ export function AuthScreen({ mode, onModeChange, onBack }: { mode: AuthMode; onM
             <form onSubmit={handleSubmit} onChange={() => { setSubmitMessage(""); setSubmitError(false); }} className="mt-8 space-y-5">
               {!isLogin && <label className="block text-sm font-semibold">Full name<input required name="name" autoComplete="name" placeholder="Your name" className="auth-input mt-2" /></label>}
               <label className="block text-sm font-semibold">Email address<div className="auth-field mt-2"><Mail className="h-4 w-4 text-muted-foreground" /><input required name="email" type="email" autoComplete="email" placeholder="Enter your email address" /></div></label>
-              <label className="block text-sm font-semibold">Password<div className="auth-field mt-2"><LockKeyhole className="h-4 w-4 text-muted-foreground" /><input required name="password" type={showPassword ? "text" : "password"} autoComplete={isLogin ? "current-password" : "new-password"} minLength={8} placeholder="Enter your password" /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-muted-foreground hover:text-brand-700">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></label>
+              <label className="block text-sm font-semibold">Password<div className="auth-field mt-2"><LockKeyhole className="h-4 w-4 text-muted-foreground" /><input required name="password" type={showPassword ? "text" : "password"} autoComplete={isLogin ? "current-password" : "new-password"} minLength={isLogin ? undefined : 8} placeholder="Enter your password" /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="text-muted-foreground hover:text-brand-700">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></label>
               {isLogin ? <div className="flex items-center justify-between text-xs"><label className="flex cursor-pointer items-center gap-2 text-white/65"><input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} className="h-4 w-4 accent-brand-500" />Remember me</label><a href="mailto:support@ordernama.com?subject=Password%20reset%20request" className="font-medium text-brand-300 hover:underline">Forgot password?</a></div> : <p className="text-xs leading-5 text-white/60">By creating an account, you agree to our <Link href="/terms" className="font-medium text-brand-300 hover:underline">Terms</Link> and <Link href="/privacy" className="font-medium text-brand-300 hover:underline">Privacy Policy</Link>.</p>}
               <button type="submit" disabled={submitting} className="w-full rounded-xl bg-brand-gradient px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-700/15 transition hover:brightness-105 active:scale-[0.99] disabled:cursor-wait disabled:opacity-70">{submitting ? "Please wait…" : isLogin ? "Continue" : "Create account"}</button>
               {submitMessage && <p role={submitError ? "alert" : "status"} className={`rounded-lg border px-3 py-2 text-center text-xs leading-5 ${submitError ? "border-rose-300/20 bg-rose-200/10 text-rose-100" : "border-brand-300/20 bg-brand-200/10 text-brand-100"}`}>{submitMessage}</p>}

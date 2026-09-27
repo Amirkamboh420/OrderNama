@@ -15,13 +15,22 @@ export async function POST(request: NextRequest) {
   if (!email || !password) return NextResponse.json({ error: "Email aur password dono required hain." }, { status: 400 });
 
   const account = await db.userAccount.findUnique({ where: { email } });
-  if (!account || !(await verifyPassword(password, account.passwordHash))) {
+  if (account && (await verifyPassword(password, account.passwordHash))) {
+    return attachSessionCookie(
+      NextResponse.json({ ok: true, user: { id: account.id, name: account.name, email: account.email, role: account.role } }),
+      account,
+      body.remember !== false,
+    );
+  }
+
+  const staff = await db.staff.findFirst({ where: { email } });
+  if (!staff || !staff.active || !staff.passwordHash || !(await verifyPassword(password, staff.passwordHash))) {
     return NextResponse.json({ error: "Email ya password ghalat hai." }, { status: 401 });
   }
 
   return attachSessionCookie(
-    NextResponse.json({ ok: true, user: { id: account.id, name: account.name, email: account.email, role: account.role } }),
-    account,
+    NextResponse.json({ ok: true, user: { id: staff.id, name: staff.name, email: staff.email, role: "staff" } }),
+    { id: staff.id, sellerId: staff.sellerId, name: staff.name, email: staff.email!, role: staff.role === "manager" ? "staff" : staff.role },
     body.remember !== false,
   );
 }
