@@ -97,19 +97,19 @@ function Hero({ onEnter, onPricing }: { onEnter: () => void; onPricing: () => vo
       <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-lime-bright opacity-60 blur-3xl" />
       <div className="absolute -left-24 bottom-0 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10 lg:px-8 lg:py-20 xl:gap-12 xl:px-10">
+      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-10 lg:px-8 lg:py-20 xl:gap-12 xl:px-10">
         {/* Left copy */}
-        <div className="max-w-[620px] text-white">
+        <div className="min-w-0 max-w-[620px] text-white">
           <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold backdrop-blur sm:text-xs">
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
             <span className="leading-relaxed">Made for Pakistan&apos;s Instagram & WhatsApp sellers</span>
           </div>
-          <h1 className="mt-5 max-w-[560px] text-[clamp(3.2rem,7vw,8rem)] font-extrabold leading-[0.82] tracking-[-0.07em] text-white">
+          <h1 className="mt-5 max-w-[560px] text-[clamp(2.5rem,4.4vw,4.5rem)] font-extrabold leading-[0.96] tracking-[-0.06em] text-white [text-wrap:balance]">
             Excel chhodo.
             <br />
             <span className="bg-white bg-clip-text text-transparent">Orders ek jagah manage karo.</span>
           </h1>
-          <p className="mt-5 max-w-[560px] text-sm leading-relaxed text-white/90 sm:text-base lg:text-lg">
+          <p className="mt-7 max-w-[560px] text-sm leading-relaxed text-white/90 sm:text-base lg:text-lg">
             OrderNama ek simple mobile-friendly tool hai jo aapke Instagram aur WhatsApp orders ko
             ek jagah rakhta hai — order entry, customer tracking, delivery status, payment record,
             aur automatic WhatsApp confirmation. Sab kuch bilkul simple.
@@ -148,7 +148,7 @@ function Hero({ onEnter, onPricing }: { onEnter: () => void; onPricing: () => vo
         </div>
 
         {/* Right preview card */}
-        <div className="relative w-full max-w-[560px] animate-float justify-self-center lg:justify-self-end">
+        <div className="relative w-full min-w-0 max-w-[560px] animate-float justify-self-center lg:justify-self-end">
           <div className="absolute -inset-4 rounded-3xl bg-white/10 blur-2xl" />
           <div className="relative rounded-3xl border border-white/30 bg-white p-3 shadow-2xl sm:p-5">
             <div className="flex items-center justify-between gap-3 border-b border-brand-100 pb-3">

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, ArrowRight, ArrowUpRight, Menu, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { ShoppingBag, ArrowRight, ArrowUpRight, Menu, LogOut, LayoutDashboard, ChevronDown, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useApp } from "@/lib/store";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useApp, type Role } from "@/lib/store";
 
 const HEADER_GROUPS = [
   { label: "Company", links: [{ label: "About", href: "/about" }, { label: "Careers", href: "/careers" }] },
@@ -16,7 +16,7 @@ const HEADER_GROUPS = [
 
 export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; onRegister: () => void }) {
   const router = useRouter();
-  const enterApp = useApp((state) => state.enterApp);
+  const { enterApp, setRole, setView } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -54,8 +54,18 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
   }
 
   function openDashboard() {
+    const role = user?.role;
+    if (role && ["owner", "staff", "admin", "customer"].includes(role)) setRole(role as Role);
     enterApp();
+    if (role === "admin") setView("admin-dashboard");
+    else if (role === "customer") setView("order-form");
+    else setView("dashboard");
     router.push("/");
+  }
+
+  function openProfile() {
+    openDashboard();
+    setView("profile");
   }
 
   const roleLabel = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "";
@@ -107,21 +117,25 @@ export function MarketingHeader({ onLogin, onRegister }: { onLogin: () => void; 
 
         <div className="flex items-center gap-2">
           {!authChecked ? <div className="h-9 w-24 animate-pulse rounded-lg bg-brand-50" /> : user ? (
-            <>
-              <div className="flex items-center gap-2 rounded-full border border-brand-100 bg-white px-2.5 py-1.5 sm:px-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-xs font-bold text-white">{initials}</span>
-                <span className="leading-tight">
-                  <span className="block max-w-28 truncate text-xs font-semibold text-foreground sm:max-w-40">{user.name}</span>
-                  <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-brand-700">{roleLabel}</span>
-                </span>
-              </div>
-              <Button onClick={openDashboard} className="hidden bg-brand-gradient text-white hover:opacity-90 sm:inline-flex">
-                <LayoutDashboard className="mr-1.5 h-4 w-4" /> Dashboard
-              </Button>
-              <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out" title="Sign out" className="text-muted-foreground hover:text-rose-600">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full border border-brand-100 bg-white px-2.5 py-1.5 transition hover:bg-brand-50" aria-label="Account menu">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-xs font-bold text-white">{initials}</span>
+                  <span className="hidden text-left leading-tight sm:block">
+                    <span className="block max-w-28 truncate text-xs font-semibold text-foreground sm:max-w-40">{user.name}</span>
+                    <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-brand-700">{roleLabel}</span>
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-60 rounded-xl">
+                <DropdownMenuLabel className="truncate text-xs text-muted-foreground">{user.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={openProfile} className="min-h-10 cursor-pointer"><UserRound className="h-4 w-4" /> Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={openDashboard} className="min-h-10 cursor-pointer"><LayoutDashboard className="h-4 w-4" /> {user.role === "customer" ? "My Orders" : "Dashboard"}</DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut} className="min-h-10 cursor-pointer text-rose-600 focus:text-rose-700"><LogOut className="h-4 w-4" /> Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <Button variant="ghost" onClick={onLogin} className="hidden text-brand-700 hover:bg-brand-50 sm:inline-flex">Login</Button>

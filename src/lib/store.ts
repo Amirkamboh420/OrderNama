@@ -13,6 +13,7 @@ export type ViewKey =
   | "analytics"
   | "pricing"
   | "settings"
+  | "profile"
   | "notifications"
   | "support"
   | "staff"

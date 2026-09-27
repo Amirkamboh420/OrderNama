@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useApp, type ViewKey, type Role } from "@/lib/store";
-import { Bell, Languages, Menu, Moon, Search, Sun, Shield, ChevronDown, Settings } from "lucide-react";
+import { Bell, Languages, Menu, Moon, Search, Sun, UserRound, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,14 +17,15 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 
 const TITLES: Record<ViewKey, { title: string; subtitle: string }> = {
-  landing: { title: "Welcome", subtitle: "OrderNama — orders, customers & payments in one place" },
+  landing: { title: "Welcome", subtitle: "OrderNama â€” orders, customers & payments in one place" },
   dashboard: { title: "Dashboard", subtitle: "Aapke business ka aaj ka haal" },
-  orders: { title: "Orders", subtitle: "All customer orders — filter, search aur status update" },
+  orders: { title: "Orders", subtitle: "All customer orders â€” filter, search aur status update" },
   customers: { title: "Customers", subtitle: "Repeat buyers aur naye customers ki list" },
   inventory: { title: "Inventory", subtitle: "Stock levels aur low-stock alerts" },
   analytics: { title: "Analytics", subtitle: "Sales trends, top items aur customer insights" },
   pricing: { title: "Plans & Billing", subtitle: "Free, Pro aur Business plans" },
   settings: { title: "Settings", subtitle: "Business profile, WhatsApp aur order form" },
+  profile: { title: "Profile", subtitle: "Aapke account ki maloomat" },
   notifications: { title: "Notifications", subtitle: "Low stock, pending orders aur alerts" },
   support: { title: "Support", subtitle: "Support tickets aur help center" },
   staff: { title: "Staff & Team", subtitle: "Manage staff accounts aur permissions" },
@@ -45,9 +46,12 @@ export function AppTopbar() {
   useEffect(() => {
     fetch("/api/auth/session")
       .then((response) => response.json())
-      .then((result: { authenticated?: boolean; user?: { name?: string } | null }) => {
+      .then((result: { authenticated?: boolean; user?: { name?: string; role?: string } | null }) => {
         setAuthenticated(Boolean(result.authenticated));
         setAccountName(result.user?.name || "");
+        if (result.user?.role && ["owner", "staff", "admin", "customer"].includes(result.user.role)) {
+          setRole(result.user.role as Role);
+        }
       })
       .catch(() => setAuthenticated(false));
   }, []);
@@ -100,7 +104,7 @@ export function AppTopbar() {
     };
   }, []);
 
-  // Debounce local search → store (so orders list can react)
+  // Debounce local search â†’ store (so orders list can react)
   useEffect(() => {
     const t = setTimeout(() => {
       setSearchQuery(localSearch);
@@ -138,7 +142,7 @@ export function AppTopbar() {
           <p className="hidden truncate text-xs text-muted-foreground sm:block">{meta.subtitle}</p>
         </div>
 
-        {/* Search — writes to global store + navigates to orders on Enter */}
+        {/* Search â€” writes to global store + navigates to orders on Enter */}
         <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -164,14 +168,14 @@ export function AppTopbar() {
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Clear search"
             >
-              <span className="text-xs">✕</span>
+              <span className="text-xs">âœ•</span>
             </button>
           )}
         </div>
 
         <div className="hidden items-center gap-1 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-800 ring-1 ring-brand-200 lg:flex dark:bg-brand-900/30 dark:text-brand-300 dark:ring-brand-800">
           <span className="h-1.5 w-1.5 rounded-full bg-brand-600 animate-status-pulse" />
-          {now || "—"}
+          {now || "â€”"}
         </div>
 
         {/* Roman Urdu toggle */}
@@ -186,7 +190,7 @@ export function AppTopbar() {
           title="Roman Urdu interface"
         >
           <Languages className="h-3.5 w-3.5" />
-          ر
+          Ø±
         </button>
 
         <Button
@@ -208,7 +212,7 @@ export function AppTopbar() {
           <span className="absolute right-1.5 top-1.5 flex h-2 w-2 rounded-full bg-rose-500 ring-2 ring-background animate-status-pulse" />
         </button>
 
-        {/* Role switcher + avatar dropdown */}
+        {/* Account menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -226,68 +230,18 @@ export function AppTopbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="text-xs text-muted-foreground">Switch Role</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs text-muted-foreground">{accountName || role}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {authenticated && (
-              <DropdownMenuItem onClick={signOut} className="cursor-pointer text-rose-600 focus:text-rose-700">
-                <Sun className="h-4 w-4" />
-                Sign out
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={() => { setRole("owner"); toast.success("Switched to Owner role"); }}
-              className="cursor-pointer"
-            >
-              <Shield className="h-4 w-4 text-brand-600" />
-              <div className="flex flex-col">
-                <span className="font-medium">Owner</span>
-                <span className="text-[10px] text-muted-foreground">Full access</span>
-              </div>
-              {role === "owner" && <span className="ml-auto text-brand-600">✓</span>}
+            <DropdownMenuItem onClick={() => setView("profile")} className="cursor-pointer">
+              <UserRound className="h-4 w-4" /> Profile
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => { setRole("staff"); toast.success("Switched to Staff role"); }}
-              className="cursor-pointer"
-            >
-              <Shield className="h-4 w-4 text-blue-600" />
-              <div className="flex flex-col">
-                <span className="font-medium">Staff</span>
-                <span className="text-[10px] text-muted-foreground">Orders + customers + inventory</span>
-              </div>
-              {role === "staff" && <span className="ml-auto text-brand-600">✓</span>}
+            <DropdownMenuItem onClick={() => setView(role === "admin" ? "admin-dashboard" : role === "customer" ? "order-form" : "dashboard")} className="cursor-pointer">
+              <LayoutDashboard className="h-4 w-4" /> {role === "customer" ? "My Orders" : "Dashboard"}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => { setRole("admin"); toast.success("Switched to Admin role"); }}
-              className="cursor-pointer"
-            >
-              <Shield className="h-4 w-4 text-purple-600" />
-              <div className="flex flex-col">
-                <span className="font-medium">Admin</span>
-                <span className="text-[10px] text-muted-foreground">Platform-wide access</span>
-              </div>
-              {role === "admin" && <span className="ml-auto text-brand-600">✓</span>}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => { setRole("customer"); toast.success("Switched to Customer role"); }}
-              className="cursor-pointer"
-            >
-              <Shield className="h-4 w-4 text-amber-600" />
-              <div className="flex flex-col">
-                <span className="font-medium">Customer</span>
-                <span className="text-[10px] text-muted-foreground">Public order form view</span>
-              </div>
-              {role === "customer" && <span className="ml-auto text-brand-600">✓</span>}
-            </DropdownMenuItem>
+            {authenticated && <DropdownMenuItem onClick={signOut} className="cursor-pointer text-rose-600 focus:text-rose-700">
+              <LogOut className="h-4 w-4" /> Sign out
+            </DropdownMenuItem>}
             <DropdownMenuSeparator />
-            {role !== "customer" && role !== "admin" && (
-              <DropdownMenuItem
-                onClick={() => setView("settings")}
-                className="cursor-pointer"
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-            )}
             <DropdownMenuItem
               onClick={() => exitApp()}
               className="cursor-pointer text-rose-600 focus:text-rose-700"

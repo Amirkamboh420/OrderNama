@@ -17,6 +17,7 @@ import { AdminDashboard } from "@/components/ordernama/admin-dashboard";
 import { SellerManagement } from "@/components/ordernama/seller-management";
 import { SupportView } from "@/components/ordernama/support-view";
 import { StaffView } from "@/components/ordernama/staff-view";
+import { AccountProfile } from "@/components/ordernama/account-profile";
 import { ContactView } from "@/components/ordernama/contact-view";
 import { PublicOrderForm } from "@/components/ordernama/public-order-form";
 import { ArrowLeft, Store } from "lucide-react";
@@ -80,6 +81,7 @@ export default function Home() {
               {view === "analytics" && <AnalyticsView />}
               {view === "pricing" && <PricingView />}
               {view === "settings" && <SettingsView />}
+              {view === "profile" && <AccountProfile />}
               {view === "notifications" && <NotificationsView />}
               {view === "support" && <SupportView />}
               {view === "staff" && <StaffView />}
