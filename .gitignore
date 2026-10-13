@@ -1,7 +1,7 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-node_modules
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -9,88 +9,147 @@ node_modules
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.npm/
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
 .env
 .env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
 !.env.sample
+*.pem
+*.key
+*.cert
+*.crt
+credentials*.json
+service-account*.json
 
-# vercel
-.vercel
+# ==========================================
+# Next.js & Build Outputs
+# ==========================================
+.next/
+out/
+build/
+dist/
+.turbo/
 
-# editor / local tooling
-.vscode/
-.idea/
-.cursor/
-.claude/
-.z-ai-config/
-local-*
-*.swp
-*.swo
-*.tmp
-*.temp
+# ==========================================
+# TypeScript & Linting Caches
+# ==========================================
+*.tsbuildinfo
+next-env.d.ts
+.eslintcache
+.stylelintcache
 
-# generated / runtime artifacts
-/.next/
-/out/
-/build/
-/coverage/
-/.turbo/
-/tmp/
-temp/
+# ==========================================
+# Databases & Local Data Files
+# ==========================================
+db/
+prisma/db/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+# ==========================================
+# Screenshots & Scratch Media
+# (Unimportant root screenshots ignored, public assets preserved)
+# ==========================================
+screenshot-*
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+!public/**
+
+# ==========================================
+# AI Agent Workspaces & Local Scratch Files
+# ==========================================
 agent-ctx/
 tool-results/
 download/
 tests/
 examples/
 mini-services/
-db/
 worklog.md
 AGENTS.md
 CLAUDE.md
-screenshot-*.png
-screenshot-*.jpg
-screenshot-*.jpeg
-screenshot-*.webp
-*.png
-*.jpg
-*.jpeg
-*.webp
+test
+prompt
+/skills/
+local-*
 
-# logs / process files
+# ==========================================
+# Logs & Process PID Files
+# ==========================================
+logs/
 *.log
-*.pid
-*.seed
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
 server.log
 dev.log
 dev.out.log
-test
-prompt
+*.pid
+*.pid.lock
+*.seed
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# ==========================================
+# Operating System Files
+# ==========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 
-# Skills directory
-/skills/
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ==========================================
+# IDEs, Editors & Tools
+# ==========================================
+.vscode/
+.idea/
+.cursor/
+.claude/
+.gemini/
+.agents/
+.agent/
+.z-ai-config/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.vercel
+
+# ==========================================
+# Temporary & Cache Files
+# ==========================================
+tmp/
+temp/
+/tmp/
+*.tmp
+*.temp
+*.bak
+.cache/
+coverage/
+.nyc_output/

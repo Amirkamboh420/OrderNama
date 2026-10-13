@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OrderNama — Order Management SaaS for Instagram & WhatsApp Sellers",
+  title: "OrderNama ",
   description: "Mobile-first order tracking for Pakistan's Instagram & WhatsApp sellers. Orders, customers, inventory, payments, and WhatsApp automation in one place.",
   keywords: ["order management", "WhatsApp orders", "Instagram sellers", "Pakistan", "boutique", "JazzCash", "EasyPaisa", "COD"],
   authors: [{ name: "OrderNama" }],

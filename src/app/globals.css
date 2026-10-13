@@ -215,6 +215,7 @@
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: white;
+  color: #0f172a;
   padding: 0 14px;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -231,6 +232,7 @@
   min-width: 0;
   border: 0;
   background: transparent;
+  color: #0f172a;
   font-size: 0.875rem;
   outline: none;
 }
